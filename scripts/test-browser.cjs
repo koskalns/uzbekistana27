@@ -23,11 +23,17 @@ const server = http.createServer((req,res)=>{
   const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)failed.push(r.url())});
   const base='http://127.0.0.1:4174/uzbekistana27/';await page.goto(base);await page.waitForTimeout(1000);
   const visit=async id=>{await page.locator('#'+id).scrollIntoViewIfNeeded();await page.waitForTimeout(1100)};
-  assert.equal(await page.locator('main > section').count(),11,'all sections in one document');
+  assert.equal(await page.locator('main > section').count(),13,'all sections in one document');
   assert.equal(await page.locator('section[inert],section[aria-hidden=true]').count(),0);
   assert.equal(await page.locator('#dots').count(),0);
   assert(await page.evaluate(()=>document.documentElement.scrollHeight>innerHeight*6));
   assert(await page.locator('#pargajiens h2').evaluate(el=>el.classList.contains('reveal')&&!el.classList.contains('is-visible')),'offscreen heading prepared for scroll reveal');
+  assert.equal(await page.locator('#devinas-dienas .duration-option').count(),3);
+  assert.match(await page.locator('#devinas-dienas-title').textContent(),/8 dienas/);
+  assert.equal(await page.locator('#taskenta img').count(),2);
+  assert.match(await page.locator('#laikapstakli').textContent(),/28,7/);
+  assert.match(await page.locator('#laikapstakli').textContent(),/12,4/);
+  for(const selector of ['#kapec .subtitle','#devinas-dienas .tday p','#laikapstakli .weather-city p','#budzets .small','#avoti .credits p']){assert.equal(await page.locator(selector).first().evaluate(el=>getComputedStyle(el).fontSize),'18px','consistent prose '+selector)}
   await page.screenshot({path:'/tmp/uzbekistana-desktop.png'});
   await page.locator('.hero-actions a').click();await page.waitForTimeout(1400);assert(await page.evaluate(()=>scrollY>500));
   await visit('kapec');await page.locator('.visual-card').first().scrollIntoViewIfNeeded();await page.waitForTimeout(1000);await page.screenshot({path:'/tmp/uzbekistana-gallery-desktop.png'});
@@ -39,9 +45,9 @@ const server = http.createServer((req,res)=>{
     assert.equal(await section.evaluate(el=>getComputedStyle(el).position),'relative');
    }
    await visit('kapec');await page.locator('.visual-card').first().scrollIntoViewIfNeeded();await page.waitForTimeout(1000);
-   const geometry=await page.locator('.visual-gallery').evaluate(el=>({width:el.clientWidth,cards:[...el.children].map(card=>{const r=card.getBoundingClientRect(),b=card.querySelector('b').getBoundingClientRect(),s=card.querySelector('span').getBoundingClientRect();return {width:r.width,height:r.height,titleBottom:b.bottom,captionTop:s.top}})}));
+   const geometry=await page.locator('#kapec .visual-gallery').evaluate(el=>({width:el.clientWidth,cards:[...el.children].map(card=>{const r=card.getBoundingClientRect(),b=card.querySelector('b').getBoundingClientRect(),s=card.querySelector('span').getBoundingClientRect();return {width:r.width,height:r.height,titleBottom:b.bottom,captionTop:s.top}})}));
    for(const card of geometry.cards){assert(card.width>=270,'large photo at '+width);assert(card.height>=190);assert(card.titleBottom<=card.captionTop,'caption overlap at '+width)}
-   if(width===390){await page.screenshot({path:'/tmp/uzbekistana-gallery-mobile.png'});await visit('sakums');await page.screenshot({path:'/tmp/uzbekistana-mobile.png'})}
+   if(width===390){await visit('taskenta');await page.locator('#taskenta img').evaluateAll(photos=>Promise.all(photos.map(photo=>photo.decode())));await page.screenshot({path:'/tmp/uzbekistana-city-mobile.png'});await visit('laikapstakli');await page.screenshot({path:'/tmp/uzbekistana-weather-mobile.png'});await page.screenshot({path:'/tmp/uzbekistana-gallery-mobile.png'});await visit('sakums');await page.screenshot({path:'/tmp/uzbekistana-mobile.png'})}
    assert(await page.locator('.nav-cta').isVisible());assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
   }
   await page.setViewportSize({width:1440,height:1000});
@@ -61,14 +67,14 @@ const server = http.createServer((req,res)=>{
   const first=await page.locator('#lightboxImage').getAttribute('src');await page.keyboard.press('ArrowRight');assert.notEqual(await page.locator('#lightboxImage').getAttribute('src'),first);await page.locator('#lightboxPrev').click();assert.equal(await page.locator('#lightboxImage').getAttribute('src'),first);
   await page.locator('#lightboxClose').focus();await page.keyboard.press('Shift+Tab');assert(await page.locator('#lightboxCredit a').last().evaluate(el=>el===document.activeElement));await page.keyboard.press('Escape');assert.equal(await page.locator('#photoLightbox').getAttribute('aria-hidden'),'true');assert(!(await page.locator('#shell').evaluate(el=>el.inert)));
   await visit('drosiba');await page.locator('.accordion button').nth(1).click();assert.equal(await page.locator('.accordion button').nth(1).getAttribute('aria-expanded'),'true');
-  await visit('braucam');await page.locator('[data-vote]').first().click();assert.match(await page.locator('[data-vote]').first().getAttribute('class'),/selected/);await page.locator('#copyInvite').click();assert.match(await page.evaluate(()=>navigator.clipboard.readText()),/Mana atbilde/);
+  await visit('braucam');await page.locator('[data-vote]').first().click();assert.match(await page.locator('[data-vote]').first().getAttribute('class'),/selected/);await page.locator('#copyInvite').click();assert.match(await page.evaluate(()=>navigator.clipboard.readText()),/Mana atbilde/);assert.match(await page.evaluate(()=>navigator.clipboard.readText()),/8 dienas/);assert.match(await page.evaluate(()=>navigator.clipboard.readText()),/4.–11./);
   await visit('kapec');await page.locator('.visual-card img').first().evaluate(im=>im.src='assets/images/missing-test.webp');await page.waitForTimeout(300);assert.equal(await page.locator('.visual-card img').first().getAttribute('data-failed'),'true');assert(await page.locator('.visual-card img').first().evaluate(im=>im.naturalWidth>0));
   await page.emulateMedia({reducedMotion:'reduce'});assert(await page.locator('.reveal').evaluateAll(elements=>elements.every(el=>getComputedStyle(el).opacity==='1')));
   await page.locator('.topbar nav a[href="#budzets"]').click();await page.waitForTimeout(200);assert.equal(await page.evaluate(()=>location.hash),'#budzets');
   await visit('avoti');await page.waitForTimeout(100);assert(await page.locator('#chapterLine').evaluate(el=>parseFloat(getComputedStyle(el).transform.split(',')[0].replace('matrix(',''))>.9));
   const before=await page.evaluate(()=>scrollY);await page.locator('body').click({position:{x:10,y:10}});await page.keyboard.press('PageUp');await page.waitForTimeout(500);assert(await page.evaluate(()=>scrollY)<before,'native PageUp scrolls normally');
-  const noJs=await browser.newContext({javaScriptEnabled:false});const fallbackPage=await noJs.newPage();await fallbackPage.goto(base);assert.equal(await fallbackPage.locator('main > section').count(),11);assert.equal(await fallbackPage.locator('#pargajiens h2').evaluate(el=>getComputedStyle(el).opacity),'1');await noJs.close();
+  const noJs=await browser.newContext({javaScriptEnabled:false});const fallbackPage=await noJs.newPage();await fallbackPage.goto(base);assert.equal(await fallbackPage.locator('main > section').count(),13);assert.equal(await fallbackPage.locator('#pargajiens h2').evaluate(el=>getComputedStyle(el).opacity),'1');await noJs.close();
   assert.deepEqual(errors,[]);assert.deepEqual(failed.filter(url=>!url.includes('missing-test')),[]);
-  console.log('PASS: continuous native scrolling, 11 accessible sections, scroll reveals, 320–1440px layouts, large gallery and captions, local photos with remote requests blocked, itinerary, budget/clipboard, checklist persistence, lightbox/focus trap, accordion, local voting, fallbacks, reduced motion, anchor links, progress and no-JavaScript content.');
+  console.log('PASS: continuous native scrolling, 13 accessible sections, scroll reveals, 320–1440px layouts, large gallery and captions, local photos with remote requests blocked, itinerary, budget/clipboard, checklist persistence, lightbox/focus trap, accordion, local voting, fallbacks, reduced motion, anchor links, progress and no-JavaScript content.');
  } finally {await browser.close();server.close()}
 })().catch(error=>{console.error(error);server.close();process.exitCode=1});

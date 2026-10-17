@@ -1,0 +1,18 @@
+{
+  "source": "https://worldweather.wmo.int/en/json/115_en.json",
+  "retrieved": "2026-10-17",
+  "provider": "WMO WWIS / Uzhydromet",
+  "averaging_period": "Not specified in source",
+  "september": {
+    "month": 9,
+    "maxTemp": "28.7",
+    "minTemp": "12.4",
+    "meanTemp": null,
+    "maxTempF": "83.7",
+    "minTempF": "54.3",
+    "meanTempF": null,
+    "raindays": "3.2",
+    "rainfall": "4.5",
+    "climateFromMemDate": "2001-05-14"
+  }
+}
