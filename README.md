@@ -11,7 +11,7 @@ Interaktīvs ceļojuma stāsts latviešu valodā: 2027. gada 4.–12. septembris
 - `assets/js/photos.js` — foto metadati galerijas parakstiem, lai arī tie neprasītu ārējus pieprasījumus.
 - `uzbekistana_piedzivojums_bildes_labotas.html` — nemainīts sākotnējais fails salīdzināšanai; netiek publicēts kā vietnes ieeja.
 
-Nav būvēšanas soļa, API atslēgu, fontu CDN vai servera datubāzes. Foto un visi pamata resursi tiek pasniegti lokāli. Pēc sākotnējās lapas ielādes nav nepieciešami ārēji attēlu serveri; pilnīga jauna ielāde bez interneta nav garantēta, jo vietne neizmanto service worker. Ekipējuma saraksts glabājas tikai konkrētā pārlūka `localStorage`. Balsojums darbojas tikai pašreizējā lapā un neapkopo draugu atbildes.
+Nav būvēšanas soļa, API atslēgu, fontu CDN vai servera datubāzes. Interaktīvā karte izmanto repozitorijā saglabātu Leaflet 1.9.4 bibliotēku; detalizētās OpenStreetMap kartes flīzes tiek ielādētas internetā tikai kartes apskatei. Foto un visi pamata resursi tiek pasniegti lokāli. Pēc sākotnējās lapas ielādes nav nepieciešami ārēji attēlu serveri; pilnīga jauna ielāde bez interneta nav garantēta, jo vietne neizmanto service worker. Ekipējuma saraksts glabājas tikai konkrētā pārlūka `localStorage`. Balsojums darbojas tikai pašreizējā lapā un neapkopo draugu atbildes.
 
 ## Lokālais priekšskatījums
 
@@ -50,4 +50,10 @@ Ja nepieciešams, ar `CHROME_PATH` norādi Chrome izpildāmo failu un ar `PLAYWR
 
 ## Tehnoloģiju izvēle
 
-Lapa izmanto semantisku HTML, adaptīvu CSS (Grid, Flexbox) un parastu JavaScript. Intersection Observer aktivizē elementu parādīšanos, kad tie ienāk skatā; CSS animē tikai caurspīdīgumu un transformācijas. Ritināšana paliek pārlūka pārziņā. `prefers-reduced-motion` izslēdz kustības, un saturs pēc noklusējuma ir redzams arī bez JavaScript. Šim statiskajam GitHub Pages projektam React, būvēšanas sistēma un animāciju bibliotēka nav nepieciešama.
+Lapa izmanto semantisku HTML, adaptīvu CSS (Grid, Flexbox) un parastu JavaScript. Intersection Observer aktivizē elementu parādīšanos, kad tie ienāk skatā; CSS animē tikai caurspīdīgumu un transformācijas. Ritināšana paliek pārlūka pārziņā. `prefers-reduced-motion` izslēdz kustības, un saturs pēc noklusējuma ir redzams arī bez JavaScript. Šim statiskajam GitHub Pages projektam React, būvēšanas sistēma un animāciju bibliotēka nav nepieciešama; ģeogrāfiskajai kartei pievienota tikai lokāla Leaflet bibliotēka.
+
+## Ģeogrāfiskā karte
+
+`assets/js/map.js` vada trīs kartes skatus (valsts, Taškenta–kalni, kalnu apvidus), vietu marķierus, koordinātu logus un tīkla kļūdu stāvokli. `assets/vendor/leaflet/` satur Leaflet 1.9.4 un tā BSD licenci. `assets/maps/` satur Natural Earth valstu kontūras, lokālo SVG pārskatu un datu izcelsmes aprakstu. OpenStreetMap flīzes tiek izmantotas tikai redzamajai interaktīvajai kartei, nevis lejupielādētas bezsaistes arhīvā. Lapas ritināšana ar peles riteni nemaina kartes mērogu; telefonā viena pirksta vilciens paliek lapai. Kartes aplis ir vispārīgs apvidus, nevis verificēta taka, nometne, robeža vai atļauja.
+
+Kartes automatizētās pārbaudes: `node scripts/test-map.cjs`. Tās imitē flīžu atbildes, lai nepārvietotu un nemērogotu karti automatizēti pret kopienas flīžu serveri. Pārbaudīti trīs skati, marķieri, pietuvināšana, koordinātu logi, tālruņu izkārtojums, bezsaistes aizstājējs un saturs bez JavaScript.

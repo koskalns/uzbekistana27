@@ -47,7 +47,7 @@ const server = http.createServer((req,res)=>{
   await page.setViewportSize({width:1440,height:1000});
   const images=JSON.parse(fs.readFileSync(path.join(root,'assets/images/manifest.json')));
   for(const image of images)assert(await page.evaluate(async src=>{const im=new Image();im.src=src;await im.decode();return im.naturalWidth>0},image.path));
-  await page.locator('main img').evaluateAll(images=>Promise.all(images.map(im=>{im.loading='eager';return im.decode()})));
+  await page.locator('main img:not(.leaflet-tile)').evaluateAll(images=>Promise.all(images.map(im=>{im.loading='eager';return im.decode()})));
   await visit('pargajiens');assert(await page.locator('#pargajiens h2').evaluate(el=>el.classList.contains('is-visible')));
   for(let i=0;i<4;i++){await page.locator('[data-trail]').nth(i).click();assert.equal(await page.locator('[data-trail]').nth(i).getAttribute('aria-selected'),'true');await page.locator('#trailPhoto').evaluate(async el=>{const im=new Image();im.src=el.style.backgroundImage.match(/url\(["']?([^"')]+)/)[1];await im.decode()})}
   await page.locator('[data-trail]').nth(3).press('ArrowLeft');assert.equal(await page.locator('[data-trail]').nth(2).getAttribute('aria-selected'),'true');

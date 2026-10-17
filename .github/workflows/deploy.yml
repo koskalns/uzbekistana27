@@ -23,7 +23,7 @@ jobs:
         run: |
           mkdir -p dist/assets
           cp index.html dist/
-          cp -R assets/css assets/js dist/assets/
+          cp -R assets/css assets/js assets/vendor assets/maps dist/assets/
           mkdir -p dist/assets/images
           cp assets/images/*.webp assets/images/*.jpg assets/images/*.svg assets/images/*.json assets/images/*.md dist/assets/images/
           cp assets/favicon.svg dist/assets/
