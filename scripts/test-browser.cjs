@@ -30,7 +30,7 @@ const server = http.createServer((req,res)=>{
   assert(await page.locator('#pargajiens h2').evaluate(el=>el.classList.contains('reveal')&&!el.classList.contains('is-visible')),'offscreen heading prepared for scroll reveal');
   assert.equal(await page.locator('#devinas-dienas .duration-option').count(),3);
   assert.match(await page.locator('#devinas-dienas-title').textContent(),/8 dienas/);
-  assert.equal(await page.locator('#taskenta img').count(),2);
+  assert.equal(await page.locator('#taskenta img').count(),6);
   assert.match(await page.locator('#laikapstakli').textContent(),/28,7/);
   assert.match(await page.locator('#laikapstakli').textContent(),/12,4/);
   for(const selector of ['#kapec .subtitle','#devinas-dienas .tday p','#laikapstakli .weather-city p','#budzets .small','#avoti .credits p']){assert.equal(await page.locator(selector).first().evaluate(el=>getComputedStyle(el).fontSize),'18px','consistent prose '+selector)}
@@ -52,7 +52,7 @@ const server = http.createServer((req,res)=>{
    await visit('kapec');await page.locator('.visual-card').first().scrollIntoViewIfNeeded();await page.waitForTimeout(1000);
    const geometry=await page.locator('#kapec .visual-gallery').evaluate(el=>({width:el.clientWidth,cards:[...el.children].map(card=>{const r=card.getBoundingClientRect(),b=card.querySelector('b').getBoundingClientRect(),s=card.querySelector('span').getBoundingClientRect();return {width:r.width,height:r.height,titleBottom:b.bottom,captionTop:s.top}})}));
    for(const card of geometry.cards){assert(card.width>=270,'large photo at '+width);assert(card.height>=190);assert(card.titleBottom<=card.captionTop,'caption overlap at '+width)}
-   if(width===390){await page.locator('.stay-card').scrollIntoViewIfNeeded();await page.waitForTimeout(1100);await page.screenshot({path:'/tmp/uzbekistana-booking-mobile.png'});await visit('taskenta');await page.locator('#taskenta img').evaluateAll(photos=>Promise.all(photos.map(photo=>photo.decode())));await page.screenshot({path:'/tmp/uzbekistana-city-mobile.png'});await visit('laikapstakli');await page.screenshot({path:'/tmp/uzbekistana-weather-mobile.png'});await page.screenshot({path:'/tmp/uzbekistana-gallery-mobile.png'});await visit('sakums');await page.screenshot({path:'/tmp/uzbekistana-mobile.png'})}
+   if(width===390){await page.locator('.stay-card').scrollIntoViewIfNeeded();await page.waitForTimeout(1100);await page.screenshot({path:'/tmp/uzbekistana-booking-mobile.png'});await visit('taskenta');await page.locator('#taskenta img').evaluateAll(photos=>Promise.all(photos.map(photo=>{photo.loading='eager';return photo.decode()})));await page.screenshot({path:'/tmp/uzbekistana-city-mobile.png'});await visit('laikapstakli');await page.screenshot({path:'/tmp/uzbekistana-weather-mobile.png'});await page.screenshot({path:'/tmp/uzbekistana-gallery-mobile.png'});await visit('sakums');await page.screenshot({path:'/tmp/uzbekistana-mobile.png'})}
    assert(await page.locator('.nav-cta').isVisible());assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
   }
   await page.setViewportSize({width:1440,height:1000});
