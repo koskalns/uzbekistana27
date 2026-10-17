@@ -232,5 +232,61 @@
     "license": "CC BY-SA 4.0",
     "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
     "changes": "Resized and converted to WebP; displayed with cropping and dark overlays."
+  },
+  {
+    "file": "Circular bokeh behind a glass of red wine.jpg",
+    "path": "assets/images/drink-wine.webp",
+    "source": "https://commons.wikimedia.org/wiki/File:Circular%20bokeh%20behind%20a%20glass%20of%20red%20wine.jpg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Circular_bokeh_behind_a_glass_of_red_wine.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original",
+    "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Circular_bokeh_behind_a_glass_of_red_wine.jpg/1280px-Circular_bokeh_behind_a_glass_of_red_wine.jpg",
+    "width": 1062,
+    "height": 1600,
+    "derivative_sha256": "50022b8edf21b0f8cc3e836eb580204173f9eafa6b94edcc789cb7035bbe8908",
+    "author": "WiLPrZ",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "changes": "Resized and converted to WebP; displayed with CSS cropping and overlays."
+  },
+  {
+    "file": "Beer in glass.jpeg",
+    "path": "assets/images/drink-beer.webp",
+    "source": "https://commons.wikimedia.org/wiki/File:Beer%20in%20glass.jpeg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Beer_in_glass.jpeg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original",
+    "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Beer_in_glass.jpeg/1280px-Beer_in_glass.jpeg",
+    "width": 1200,
+    "height": 1600,
+    "derivative_sha256": "28b47d38f1cbcd9572fbebdb74a80c2d6db22c9c80f3fdd97efa619628a30d0e",
+    "author": "codybrom",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "changes": "Resized and converted to WebP; displayed with CSS cropping and overlays."
+  },
+  {
+    "file": "Samarkandian palov.jpg",
+    "path": "assets/images/food-plov.webp",
+    "source": "https://commons.wikimedia.org/wiki/File:Samarkandian%20palov.jpg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/2/23/Samarkandian_palov.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original",
+    "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Samarkandian_palov.jpg/1280px-Samarkandian_palov.jpg",
+    "width": 1280,
+    "height": 960,
+    "derivative_sha256": "2a9892fb928ae5ff7d6286c08a2ea348e7c358395076a4a34bf9e3296405ac01",
+    "author": "Farsizabon",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "changes": "Resized and converted to WebP; displayed with CSS cropping and overlays."
+  },
+  {
+    "file": "Jizzax somsa.jpg",
+    "path": "assets/images/food-samsa.webp",
+    "source": "https://commons.wikimedia.org/wiki/File:Jizzax%20somsa.jpg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Jizzax_somsa.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original",
+    "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Jizzax_somsa.jpg/1280px-Jizzax_somsa.jpg",
+    "width": 1200,
+    "height": 1600,
+    "derivative_sha256": "9655c606f73fdfbef28fc47b99b0117c0f834dba63692362d2ec339181b4abd3",
+    "author": "Zoirovna",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "changes": "Resized and converted to WebP; displayed with CSS cropping and overlays."
   }
 ]

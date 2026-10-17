@@ -28,3 +28,12 @@ All files are resized WebP derivatives; CSS crops and dark overlays are used. Ea
 - **Minor masjidi 19.jpg** — Humoyun Mehridinov. [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). [Original source](https://commons.wikimedia.org/wiki/File:Minor%20masjidi%2019.jpg). Local: `tashkent-minor.webp`. 2400 × 1600 px. Resized, converted to WebP, displayed with CSS cropping and overlays; original license retained.
 - **Tashkent, Uzbekistan (6136429521).jpg** — Fabio Achilli. [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/). [Original source](https://commons.wikimedia.org/wiki/File:Tashkent%2C%20Uzbekistan%20%286136429521%29.jpg). Local: `tashkent-khast-imam.webp`. 2400 × 1446 px. Resized, converted to WebP, displayed with CSS cropping and overlays; original license retained.
 - **Kosmonaut 5, Metrostation Kosmonavtlar in Taschkent.jpg** — Schokifaktor. [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). [Original source](https://commons.wikimedia.org/wiki/File:Kosmonaut%205%2C%20Metrostation%20Kosmonavtlar%20in%20Taschkent.jpg). Local: `tashkent-cosmonauts.webp`. 2400 × 1800 px. Resized, converted to WebP, displayed with CSS cropping and overlays; original license retained.
+
+## Food and drink photography
+
+Drinks are illustrative photographs, not images of the named Uzbek brands.
+
+- **Circular bokeh behind a glass of red wine.jpg** — WiLPrZ. [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/). [Source](https://commons.wikimedia.org/wiki/File:Circular%20bokeh%20behind%20a%20glass%20of%20red%20wine.jpg). Local file: `drink-wine.webp`. Resized to WebP; CSS cropping and overlays; original license retained.
+- **Beer in glass.jpeg** — codybrom. [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). [Source](https://commons.wikimedia.org/wiki/File:Beer%20in%20glass.jpeg). Local file: `drink-beer.webp`. Resized to WebP; CSS cropping and overlays; original license retained.
+- **Samarkandian palov.jpg** — Farsizabon. [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). [Source](https://commons.wikimedia.org/wiki/File:Samarkandian%20palov.jpg). Local file: `food-plov.webp`. Resized to WebP; CSS cropping and overlays; original license retained.
+- **Jizzax somsa.jpg** — Zoirovna. [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). [Source](https://commons.wikimedia.org/wiki/File:Jizzax%20somsa.jpg). Local file: `food-samsa.webp`. Resized to WebP; CSS cropping and overlays; original license retained.

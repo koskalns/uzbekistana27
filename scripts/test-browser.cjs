@@ -23,7 +23,7 @@ const server = http.createServer((req,res)=>{
   const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)failed.push(r.url())});
   const base='http://127.0.0.1:4174/uzbekistana27/';await page.goto(base);await page.waitForTimeout(1000);
   const visit=async id=>{await page.locator('#'+id).scrollIntoViewIfNeeded();await page.waitForTimeout(1100)};
-  assert.equal(await page.locator('main > section').count(),13,'all sections in one document');
+  assert.equal(await page.locator('main > section').count(),14,'all sections in one document');
   assert.equal(await page.locator('section[inert],section[aria-hidden=true]').count(),0);
   assert.equal(await page.locator('#dots').count(),0);
   assert(await page.evaluate(()=>document.documentElement.scrollHeight>innerHeight*6));
@@ -78,8 +78,8 @@ const server = http.createServer((req,res)=>{
   await page.locator('.topbar nav a[href="#budzets"]').click();await page.waitForTimeout(200);assert.equal(await page.evaluate(()=>location.hash),'#budzets');
   await visit('avoti');await page.waitForTimeout(100);assert(await page.locator('#chapterLine').evaluate(el=>parseFloat(getComputedStyle(el).transform.split(',')[0].replace('matrix(',''))>.9));
   const before=await page.evaluate(()=>scrollY);await page.locator('body').click({position:{x:10,y:10}});await page.keyboard.press('PageUp');await page.waitForTimeout(500);assert(await page.evaluate(()=>scrollY)<before,'native PageUp scrolls normally');
-  const noJs=await browser.newContext({javaScriptEnabled:false});const fallbackPage=await noJs.newPage();await fallbackPage.goto(base);assert.equal(await fallbackPage.locator('main > section').count(),13);assert.equal(await fallbackPage.locator('#pargajiens h2').evaluate(el=>getComputedStyle(el).opacity),'1');await noJs.close();
+  const noJs=await browser.newContext({javaScriptEnabled:false});const fallbackPage=await noJs.newPage();await fallbackPage.goto(base);assert.equal(await fallbackPage.locator('main > section').count(),14);assert.equal(await fallbackPage.locator('#pargajiens h2').evaluate(el=>getComputedStyle(el).opacity),'1');await noJs.close();
   assert.deepEqual(errors,[]);assert.deepEqual(failed.filter(url=>!url.includes('missing-test')),[]);
-  console.log('PASS: continuous native scrolling, 13 accessible sections, scroll reveals, 320–1440px layouts, large gallery and captions, local photos with remote requests blocked, itinerary, budget/clipboard, checklist persistence, lightbox/focus trap, accordion, local voting, fallbacks, reduced motion, anchor links, progress and no-JavaScript content.');
+  console.log('PASS: continuous native scrolling, 14 accessible sections, scroll reveals, 320–1440px layouts, large gallery and captions, local photos with remote requests blocked, itinerary, budget/clipboard, checklist persistence, lightbox/focus trap, accordion, local voting, fallbacks, reduced motion, anchor links, progress and no-JavaScript content.');
  } finally {await browser.close();server.close()}
 })().catch(error=>{console.error(error);server.close();process.exitCode=1});
