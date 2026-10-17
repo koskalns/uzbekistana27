@@ -92,3 +92,7 @@ figure{margin:0}.hero .photo{opacity:.78; background-position:62% center}.hero .
 /* Atmosphere stays inside the chapter's scroll area. */
 @keyframes photoBreathe{from{transform:none;filter:saturate(.65) brightness(.8)}to{transform:none;filter:saturate(.85) brightness(1)}}
 @media(max-width:700px){.finale h2{font-size:clamp(40px,12vw,70px)}}
+
+/* Gallery captions flow together so wrapped descriptions cannot cover titles. */
+.visual-card figcaption{position:absolute;left:16px;right:16px;bottom:16px;z-index:2;display:grid;gap:6px}
+.visual-card figcaption b,.visual-card figcaption span{position:static;max-width:none}

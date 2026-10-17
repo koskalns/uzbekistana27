@@ -24,6 +24,23 @@ const server = http.createServer((req,res)=>{
   const base='http://127.0.0.1:4174/uzbekistana27/';await page.goto(base);await page.waitForTimeout(1100);
   await page.locator('.hero-strip img').evaluateAll(images=>Promise.all(images.map(im=>im.decode())));await page.screenshot({path:'/tmp/uzbekistana-desktop.png'});
   const count=await page.locator('.scene').count();assert.equal(count,11);
+  // Check actual gallery geometry: loaded images alone do not catch collapsed grid columns.
+  for(const width of [1440,820,390,320]){
+   await page.setViewportSize({width,height:1000});
+   await page.locator('.dot').nth(1).click();await page.waitForTimeout(900);
+   await page.locator('.visual-gallery').scrollIntoViewIfNeeded();
+   const gallery=await page.locator('.visual-gallery').evaluate(el=>{
+    const rect=el.getBoundingClientRect(),content=el.closest('.content'),style=getComputedStyle(content);
+    return {width:rect.width,available:content.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight),cards:[...el.children].map(card=>{const r=card.getBoundingClientRect(),title=card.querySelector('b').getBoundingClientRect(),caption=card.querySelector('span').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,titleBottom:title.bottom,captionTop:caption.top}})};
+   });
+   assert(Math.abs(gallery.width-gallery.available)<2,'gallery must fill content width at '+width);
+   const columns=width>980?3:width>700?2:1;
+   assert.equal(new Set(gallery.cards.map(card=>Math.round(card.x))).size,columns,'gallery columns at '+width);
+   for(const card of gallery.cards){assert(card.width>250,'usable photo width at '+width);assert(card.titleBottom<=card.captionTop,'captions overlap at '+width)}
+   await page.locator('.visual-card img').evaluateAll(images=>Promise.all(images.map(im=>im.decode())));
+   await page.screenshot({path:'/tmp/uz-gallery-'+width+'.png'});
+  }
+  await page.setViewportSize({width:1440,height:1000});
   for(let i=0;i<count;i++){
    await page.locator('.dot').nth(i).click();await page.waitForTimeout(750);
    assert.equal(await page.locator('.scene.active').count(),1);
