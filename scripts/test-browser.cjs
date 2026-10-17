@@ -21,57 +21,54 @@ const server = http.createServer((req,res)=>{
   const context=await browser.newContext({viewport:{width:1440,height:1000},permissions:['clipboard-read','clipboard-write']});
   await context.route('**/*',route=>route.request().url().startsWith('http://127.0.0.1:4174/')?route.continue():route.abort());
   const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)failed.push(r.url())});
-  const base='http://127.0.0.1:4174/uzbekistana27/';await page.goto(base);await page.waitForTimeout(1100);
-  await page.locator('.hero-strip img').evaluateAll(images=>Promise.all(images.map(im=>im.decode())));await page.screenshot({path:'/tmp/uzbekistana-desktop.png'});
-  const count=await page.locator('.scene').count();assert.equal(count,11);
-  // Check actual gallery geometry: loaded images alone do not catch collapsed grid columns.
+  const base='http://127.0.0.1:4174/uzbekistana27/';await page.goto(base);await page.waitForTimeout(1000);
+  const visit=async id=>{await page.locator('#'+id).scrollIntoViewIfNeeded();await page.waitForTimeout(1100)};
+  assert.equal(await page.locator('main > section').count(),11,'all sections in one document');
+  assert.equal(await page.locator('section[inert],section[aria-hidden=true]').count(),0);
+  assert.equal(await page.locator('#dots').count(),0);
+  assert(await page.evaluate(()=>document.documentElement.scrollHeight>innerHeight*6));
+  assert(await page.locator('#pargajiens h2').evaluate(el=>el.classList.contains('reveal')&&!el.classList.contains('is-visible')),'offscreen heading prepared for scroll reveal');
+  await page.screenshot({path:'/tmp/uzbekistana-desktop.png'});
+  await page.locator('.hero-actions a').click();await page.waitForTimeout(1400);assert(await page.evaluate(()=>scrollY>500));
+  await visit('kapec');await page.locator('.visual-card').first().scrollIntoViewIfNeeded();await page.waitForTimeout(1000);await page.screenshot({path:'/tmp/uzbekistana-gallery-desktop.png'});
   for(const width of [1440,820,390,320]){
-   await page.setViewportSize({width,height:1000});
-   await page.locator('.dot').nth(1).click();await page.waitForTimeout(900);
-   await page.locator('.visual-gallery').scrollIntoViewIfNeeded();
-   const gallery=await page.locator('.visual-gallery').evaluate(el=>{
-    const rect=el.getBoundingClientRect(),content=el.closest('.content'),style=getComputedStyle(content);
-    return {width:rect.width,available:content.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight),cards:[...el.children].map(card=>{const r=card.getBoundingClientRect(),title=card.querySelector('b').getBoundingClientRect(),caption=card.querySelector('span').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,titleBottom:title.bottom,captionTop:caption.top}})};
-   });
-   assert(Math.abs(gallery.width-gallery.available)<2,'gallery must fill content width at '+width);
-   const columns=width>980?3:width>700?2:1;
-   assert.equal(new Set(gallery.cards.map(card=>Math.round(card.x))).size,columns,'gallery columns at '+width);
-   for(const card of gallery.cards){assert(card.width>250,'usable photo width at '+width);assert(card.titleBottom<=card.captionTop,'captions overlap at '+width)}
-   await page.locator('.visual-card img').evaluateAll(images=>Promise.all(images.map(im=>im.decode())));
-   await page.screenshot({path:'/tmp/uz-gallery-'+width+'.png'});
+   await page.setViewportSize({width,height:900});
+   for(const section of await page.locator('main > section').all()){
+    await section.scrollIntoViewIfNeeded();await page.waitForTimeout(160);
+    assert(await section.evaluate(el=>el.scrollWidth<=el.clientWidth+1),'section overflow at '+width+' '+await section.getAttribute('id'));
+    assert.equal(await section.evaluate(el=>getComputedStyle(el).position),'relative');
+   }
+   await visit('kapec');await page.locator('.visual-card').first().scrollIntoViewIfNeeded();await page.waitForTimeout(1000);
+   const geometry=await page.locator('.visual-gallery').evaluate(el=>({width:el.clientWidth,cards:[...el.children].map(card=>{const r=card.getBoundingClientRect(),b=card.querySelector('b').getBoundingClientRect(),s=card.querySelector('span').getBoundingClientRect();return {width:r.width,height:r.height,titleBottom:b.bottom,captionTop:s.top}})}));
+   for(const card of geometry.cards){assert(card.width>=270,'large photo at '+width);assert(card.height>=190);assert(card.titleBottom<=card.captionTop,'caption overlap at '+width)}
+   if(width===390){await page.screenshot({path:'/tmp/uzbekistana-gallery-mobile.png'});await visit('sakums');await page.screenshot({path:'/tmp/uzbekistana-mobile.png'})}
+   assert(await page.locator('.nav-cta').isVisible());assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
   }
   await page.setViewportSize({width:1440,height:1000});
-  for(let i=0;i<count;i++){
-   await page.locator('.dot').nth(i).click();await page.waitForTimeout(750);
-   assert.equal(await page.locator('.scene.active').count(),1);
-   assert.equal(await page.locator('.scene.active').getAttribute('data-name'),await page.locator('.scene').nth(i).getAttribute('data-name'));
-   assert.equal(await page.locator('.scene.active').evaluate(s=>s.scrollWidth<=s.clientWidth),true,'chapter overflow '+i);
-   const heading=page.locator('.scene.active h1,.scene.active h2');assert.equal(await heading.evaluate(e=>e.scrollWidth<=e.closest('.content').clientWidth),true,'heading overflow '+i);
-   await page.locator('.scene.active img').evaluateAll(images=>Promise.all(images.map(im=>{im.loading='eager';return im.decode()})));
-  }
-  // Decode every local photo with all remote requests blocked.
   const images=JSON.parse(fs.readFileSync(path.join(root,'assets/images/manifest.json')));
-  for(const image of images){assert(await page.evaluate(async src=>{const im=new Image();im.src=src;await im.decode();return im.naturalWidth>0},image.path))}
-  await page.locator('.dot').nth(4).click();await page.waitForTimeout(800);
+  for(const image of images)assert(await page.evaluate(async src=>{const im=new Image();im.src=src;await im.decode();return im.naturalWidth>0},image.path));
+  await page.locator('main img').evaluateAll(images=>Promise.all(images.map(im=>{im.loading='eager';return im.decode()})));
+  await visit('pargajiens');assert(await page.locator('#pargajiens h2').evaluate(el=>el.classList.contains('is-visible')));
   for(let i=0;i<4;i++){await page.locator('[data-trail]').nth(i).click();assert.equal(await page.locator('[data-trail]').nth(i).getAttribute('aria-selected'),'true');await page.locator('#trailPhoto').evaluate(async el=>{const im=new Image();im.src=el.style.backgroundImage.match(/url\(["']?([^"')]+)/)[1];await im.decode()})}
   await page.locator('[data-trail]').nth(3).press('ArrowLeft');assert.equal(await page.locator('[data-trail]').nth(2).getAttribute('aria-selected'),'true');
-  await page.locator('.dot').nth(6).click();await page.waitForTimeout(800);
+  await visit('budzets');
   for(const [id,value] of [['people','8'],['flight','500'],['food','100']])await page.locator('#'+id).fill(value);
   await page.waitForTimeout(400);assert.equal(await page.locator('#total').textContent(),'818 €');assert.match(await page.locator('#groupTotal').textContent(),/6540/);
-  await page.locator('#copyBudget').click();assert.match(await page.evaluate(()=>navigator.clipboard.readText()),/818/);
-  await page.locator('.dot').nth(7).click();await page.waitForTimeout(800);await page.locator('#gearList input').first().check();await page.reload();await page.locator('.dot').nth(7).click();await page.waitForTimeout(800);assert(await page.locator('#gearList input').first().isChecked());assert.equal(await page.locator('#gearPercent').textContent(),'8%');
+  await page.locator('#copyBudget').click();assert.match(await page.evaluate(()=>navigator.clipboard.readText()),/6540/);
+  await visit('ekipejums');await page.locator('#gearList input').first().check();await page.reload();await visit('ekipejums');assert(await page.locator('#gearList input').first().isChecked());assert.equal(await page.locator('#gearPercent').textContent(),'8%');
   await page.locator('#copyGear').click();assert(!(await page.evaluate(()=>navigator.clipboard.readText())).includes('Telts + mietiņi'));
-  await page.locator('.dot').nth(1).click();await page.waitForTimeout(800);await page.locator('.visual-card').first().click();assert.equal(await page.locator('#photoLightbox').getAttribute('aria-hidden'),'false');const first=await page.locator('#lightboxImage').getAttribute('src');await page.keyboard.press('ArrowRight');assert.notEqual(await page.locator('#lightboxImage').getAttribute('src'),first);await page.locator('#lightboxPrev').click();assert.equal(await page.locator('#lightboxImage').getAttribute('src'),first);await page.keyboard.press('Escape');assert.equal(await page.locator('#photoLightbox').getAttribute('aria-hidden'),'true');
-  await page.locator('.dot').nth(8).click();await page.waitForTimeout(800);await page.locator('.accordion button').nth(1).click();assert.equal(await page.locator('.accordion button').nth(1).getAttribute('aria-expanded'),'true');
-  await page.locator('.dot').nth(9).click();await page.waitForTimeout(800);await page.locator('[data-vote]').first().click();assert.match(await page.locator('[data-vote]').first().getAttribute('class'),/selected/);await page.locator('#copyInvite').click();assert.match(await page.evaluate(()=>navigator.clipboard.readText()),/Mana atbilde/);
-  await page.locator('.dot').nth(0).click();await page.waitForTimeout(800);await page.locator('.scene.active h1').click();await page.keyboard.press('ArrowRight');assert.equal(await page.locator('.scene.active').getAttribute('data-name'),'Kāpēc tur');await page.keyboard.press('ArrowLeft');assert.equal(await page.locator('.scene.active').getAttribute('data-name'),'Sākums');
-  // Real file failure must show a labeled illustration, not a broken image.
-  await page.locator('.hero-strip img').first().evaluate(im=>im.src='assets/images/missing-test.webp');await page.waitForTimeout(300);assert.equal(await page.locator('.hero-strip img').first().getAttribute('data-failed'),'true');assert(await page.locator('.hero-strip img').first().evaluate(im=>im.naturalWidth>0));
-  // Mobile layout and chapter controls, still with remote networking disabled.
-  await page.setViewportSize({width:390,height:844});await page.reload();await page.waitForTimeout(900);await page.screenshot({path:'/tmp/uzbekistana-mobile.png'});
-  for(let i=0;i<count;i++){await page.locator('.dot').nth(i).click();await page.waitForTimeout(750);assert.equal(await page.locator('.scene.active').evaluate(s=>s.scrollWidth<=s.clientWidth),true,'mobile overflow '+i);assert(await page.locator('#next').isVisible())}
-  await page.emulateMedia({reducedMotion:'reduce'});await page.locator('.dot').first().click();assert.equal(await page.locator('.scene.active').evaluate(el=>getComputedStyle(el).animationName),'none');
+  await visit('kapec');await page.locator('.visual-card').first().click();assert.equal(await page.locator('#photoLightbox').getAttribute('aria-hidden'),'false');assert(await page.locator('#shell').evaluate(el=>el.inert));
+  const first=await page.locator('#lightboxImage').getAttribute('src');await page.keyboard.press('ArrowRight');assert.notEqual(await page.locator('#lightboxImage').getAttribute('src'),first);await page.locator('#lightboxPrev').click();assert.equal(await page.locator('#lightboxImage').getAttribute('src'),first);
+  await page.locator('#lightboxClose').focus();await page.keyboard.press('Shift+Tab');assert(await page.locator('#lightboxCredit a').last().evaluate(el=>el===document.activeElement));await page.keyboard.press('Escape');assert.equal(await page.locator('#photoLightbox').getAttribute('aria-hidden'),'true');assert(!(await page.locator('#shell').evaluate(el=>el.inert)));
+  await visit('drosiba');await page.locator('.accordion button').nth(1).click();assert.equal(await page.locator('.accordion button').nth(1).getAttribute('aria-expanded'),'true');
+  await visit('braucam');await page.locator('[data-vote]').first().click();assert.match(await page.locator('[data-vote]').first().getAttribute('class'),/selected/);await page.locator('#copyInvite').click();assert.match(await page.evaluate(()=>navigator.clipboard.readText()),/Mana atbilde/);
+  await visit('kapec');await page.locator('.visual-card img').first().evaluate(im=>im.src='assets/images/missing-test.webp');await page.waitForTimeout(300);assert.equal(await page.locator('.visual-card img').first().getAttribute('data-failed'),'true');assert(await page.locator('.visual-card img').first().evaluate(im=>im.naturalWidth>0));
+  await page.emulateMedia({reducedMotion:'reduce'});assert(await page.locator('.reveal').evaluateAll(elements=>elements.every(el=>getComputedStyle(el).opacity==='1')));
+  await page.locator('.topbar nav a[href="#budzets"]').click();await page.waitForTimeout(200);assert.equal(await page.evaluate(()=>location.hash),'#budzets');
+  await visit('avoti');await page.waitForTimeout(100);assert(await page.locator('#chapterLine').evaluate(el=>parseFloat(getComputedStyle(el).transform.split(',')[0].replace('matrix(',''))>.9));
+  const before=await page.evaluate(()=>scrollY);await page.locator('body').click({position:{x:10,y:10}});await page.keyboard.press('PageUp');await page.waitForTimeout(500);assert(await page.evaluate(()=>scrollY)<before,'native PageUp scrolls normally');
+  const noJs=await browser.newContext({javaScriptEnabled:false});const fallbackPage=await noJs.newPage();await fallbackPage.goto(base);assert.equal(await fallbackPage.locator('main > section').count(),11);assert.equal(await fallbackPage.locator('#pargajiens h2').evaluate(el=>getComputedStyle(el).opacity),'1');await noJs.close();
   assert.deepEqual(errors,[]);assert.deepEqual(failed.filter(url=>!url.includes('missing-test')),[]);
-  console.log('PASS: 11 chapters on desktop/mobile; 8 local photographs without external network; 4 hiking days and arrow tabs; budget and clipboard; checklist persistence; lightbox arrows/Escape; safety accordion; local vote; keyboard navigation; image fallback; reduced motion; repository subpath. No JavaScript errors or unexpected HTTP failures.');
+  console.log('PASS: continuous native scrolling, 11 accessible sections, scroll reveals, 320–1440px layouts, large gallery and captions, local photos with remote requests blocked, itinerary, budget/clipboard, checklist persistence, lightbox/focus trap, accordion, local voting, fallbacks, reduced motion, anchor links, progress and no-JavaScript content.');
  } finally {await browser.close();server.close()}
 })().catch(error=>{console.error(error);server.close();process.exitCode=1});
